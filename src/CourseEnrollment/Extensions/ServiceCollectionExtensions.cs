@@ -11,9 +11,12 @@ namespace CourseEnrollment.Extensions
         {
             // Repositories
             services.AddScoped<IStudentRepository, StudentRepository>();
+            services.AddScoped<ICourseRepository, CourseRepository>();
+
 
             // Services
             services.AddScoped<IStudentService, StudentService>();
+            services.AddScoped<ICourseService, CourseService>();
 
             return services;
         }
