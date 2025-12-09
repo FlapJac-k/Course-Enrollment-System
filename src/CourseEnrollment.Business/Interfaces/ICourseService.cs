@@ -5,10 +5,10 @@ namespace CourseEnrollment.Business.Interfaces
     public interface ICourseService
     {
         Task<IEnumerable<Course>> GetAllCoursesAsync();
-        Task<Course?> GetCourseByIdAsync(int id);
+        Task<Course?> GetCourseByIdAsync(Guid id);
         Task<Course> CreateCourseAsync(Course course);
         Task<Course> UpdateCourseAsync(Course course);
-        Task DeleteCourseAsync(int id);
-        Task<int> GetAvailableSlotsAsync(int courseId);
+        Task DeleteCourseAsync(Guid id);
+        Task<int> GetAvailableSlotsAsync(Guid courseId);
     }
 }
