@@ -1,4 +1,6 @@
 using CourseEnrollment.Data;
+using CourseEnrollment.Extensions;
+using CourseEnrollment.Mappings;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -6,8 +8,12 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
+builder.Services.AddAutoMapper(typeof(MappingProfile));
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseInMemoryDatabase("CourseEnrollmentDb"));
+
+builder.Services.AddProjectServices();
 
 
 var app = builder.Build();
