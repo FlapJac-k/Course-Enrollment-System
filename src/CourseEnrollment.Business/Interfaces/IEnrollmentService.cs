@@ -6,12 +6,9 @@ namespace CourseEnrollment.Business.Interfaces
     public interface IEnrollmentService
     {
         Task<IEnumerable<StudentCourseEnrollment>> GetAllEnrollmentsAsync();
-        Task<StudentCourseEnrollment?> GetEnrollmentByIdAsync(int id);
-        Task<EnrollmentResult> EnrollStudentAsync(int studentId, int courseId);
-        Task<bool> UnenrollStudentAsync(int enrollmentId);
-        Task<IEnumerable<StudentCourseEnrollment>> GetEnrollmentsByStudentIdAsync(int studentId);
-        Task<IEnumerable<StudentCourseEnrollment>> GetEnrollmentsByCourseIdAsync(int courseId);
-        Task<bool> IsStudentEnrolledAsync(int studentId, int courseId);
-        Task<bool> IsCourseFullAsync(int courseId);
+        Task<StudentCourseEnrollment?> GetEnrollmentByIdAsync(Guid id);
+        Task<EnrollmentResult> EnrollStudentAsync(Guid studentId, Guid courseId);
+        Task<bool> UnenrollStudentAsync(Guid enrollmentId);
+        Task<bool> IsStudentEnrolledAsync(Guid studentId, Guid courseId);
     }
 }
