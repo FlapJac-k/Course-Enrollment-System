@@ -9,5 +9,6 @@ namespace CourseEnrollment.Business.Interfaces
         Task<Student> CreateStudentAsync(Student student);
         Task<Student> UpdateStudentAsync(Student student);
         Task DeleteStudentAsync(Guid id);
+        Task<bool> IsEmailUniqueAsync(string email, Guid? excludeId = null);
     }
 }
