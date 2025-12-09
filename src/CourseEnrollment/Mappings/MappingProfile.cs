@@ -10,6 +10,15 @@ namespace CourseEnrollment.Mappings
         {
             CreateMap<Student, StudentViewModel>();
             CreateMap<StudentViewModel, Student>();
+
+            CreateMap<Course, CourseViewModel>()
+             .ForMember(dest => dest.AvailableSlots,
+                        opt => opt.MapFrom(src => src.MaximumCapacity - src.Enrollments.Count))
+             .ForMember(dest => dest.EnrollmentCount,
+                        opt => opt.MapFrom(src => src.Enrollments.Count));
+
+            CreateMap<CourseViewModel, Course>()
+                .ForMember(dest => dest.Enrollments, opt => opt.Ignore());
         }
     }
 }
