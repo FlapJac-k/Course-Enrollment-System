@@ -44,7 +44,6 @@ namespace CourseEnrollment.Data.Repositories
         public virtual async Task<T> AddAsync(T entity)
         {
             await _dbSet.AddAsync(entity);
-            await _context.SaveChangesAsync();
             return entity;
         }
 
@@ -57,7 +56,7 @@ namespace CourseEnrollment.Data.Repositories
                 _dbSet.Update(entity);
             }
 
-            await _context.SaveChangesAsync();
+            await Task.CompletedTask;
         }
 
         public virtual async Task DeleteAsync(Guid id)
@@ -66,8 +65,14 @@ namespace CourseEnrollment.Data.Repositories
             if (entity != null)
             {
                 _dbSet.Remove(entity);
-                await _context.SaveChangesAsync();
             }
+            await Task.CompletedTask;
+        }
+
+        public virtual async Task DeleteRangeAsync(IEnumerable<T> entities)
+        {
+            _dbSet.RemoveRange(entities);
+            await Task.CompletedTask;
         }
 
         protected IQueryable<T> ApplySpecification(ISpecification<T> specification)

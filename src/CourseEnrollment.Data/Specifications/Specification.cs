@@ -1,11 +1,9 @@
-using System;
-using System.Collections.Generic;
+using CourseEnrollment.Data.Entities;
 using System.Linq.Expressions;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CourseEnrollment.Data.Specifications
 {
-    public abstract class Specification<T>(Expression<Func<T, bool>>? criteria) : ISpecification<T>
+    public abstract class Specification<T>(Expression<Func<T, bool>>? criteria) : ISpecification<T> where T : BaseEntity
     {
         protected Specification() : this(null) { }
         public Expression<Func<T, bool>>? Criteria => criteria;
@@ -17,7 +15,7 @@ namespace CourseEnrollment.Data.Specifications
         public bool IsPagingEnabled { get; private set; }
 
         public IQueryable<T> ApplyCriteria(IQueryable<T> query)
-    {
+        {
             if (Criteria != null)
             {
                 query = query.Where(Criteria);

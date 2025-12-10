@@ -13,5 +13,6 @@ namespace CourseEnrollment.Data.Interfaces
         Task<T> AddAsync(T entity);
         Task UpdateAsync(T entity);
         Task DeleteAsync(Guid id);
+        Task DeleteRangeAsync(IEnumerable<T> entities);
     }
 }

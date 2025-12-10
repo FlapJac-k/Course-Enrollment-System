@@ -12,6 +12,7 @@ namespace CourseEnrollment.Data.Specifications
 
         public CourseWithEnrollmentsSpecification(Guid id) : base(x => x.Id == id)
         {
+            AddInclude(x => x.Enrollments);
         }
 
         public CourseWithEnrollmentsSpecification(PagingParams pagingParams) : base()

@@ -6,29 +6,31 @@ using CourseEnrollment.Data.Specifications;
 
 namespace CourseEnrollment.Business.Services
 {
-    public class CourseService(IRepository<Course> courseRepository) : ICourseService
+    public class CourseService(IUnitOfWork unitOfWork) : ICourseService
     {
         public async Task<IEnumerable<Course>> GetAllCoursesAsync()
         {
-            return await courseRepository.ListAsync(new CourseWithEnrollmentsSpecification());
+            return await unitOfWork.Courses.ListAsync(new CourseWithEnrollmentsSpecification());
         }
 
         public async Task<Course?> GetCourseByIdAsync(Guid id)
         {
-            return await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(id));
+            return await unitOfWork.Courses.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(id));
         }
 
         public async Task<Course> CreateCourseAsync(Course course)
         {
             ValidateMaxCapacity(course.MaximumCapacity);
-            return await courseRepository.AddAsync(course);
+            var createdCourse = await unitOfWork.Courses.AddAsync(course);
+            await unitOfWork.SaveChangesAsync();
+            return createdCourse;
         }
 
         public async Task<Course> UpdateCourseAsync(Course course)
         {
             ValidateMaxCapacity(course.MaximumCapacity);
 
-            var existingCourse = await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(course.Id));
+            var existingCourse = await unitOfWork.Courses.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(course.Id));
             if (existingCourse == null)
             {
                 throw new InvalidOperationException($"Course with ID {course.Id} not found.");
@@ -43,18 +45,20 @@ namespace CourseEnrollment.Business.Services
             existingCourse.Description = course.Description;
             existingCourse.MaximumCapacity = course.MaximumCapacity;
 
-            await courseRepository.UpdateAsync(existingCourse);
+            await unitOfWork.Courses.UpdateAsync(existingCourse);
+            await unitOfWork.SaveChangesAsync();
             return existingCourse;
         }
 
         public async Task DeleteCourseAsync(Guid id)
         {
-            await courseRepository.DeleteAsync(id);
+            await unitOfWork.Courses.DeleteAsync(id);
+            await unitOfWork.SaveChangesAsync();
         }
 
         public async Task<int> GetAvailableSlotsAsync(Guid courseId)
         {
-            var course = await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(courseId));
+            var course = await unitOfWork.Courses.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(courseId));
             if (course == null)
             {
                 return 0;
@@ -67,8 +71,8 @@ namespace CourseEnrollment.Business.Services
             var pageParam = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
             var pagedSpec = new CourseWithEnrollmentsSpecification(pageParam);
 
-            var itemsTask = courseRepository.ListAsync(pagedSpec);
-            var totalTask = courseRepository.CountAsync(new CourseWithEnrollmentsSpecification());
+            var itemsTask = unitOfWork.Courses.ListAsync(pagedSpec);
+            var totalTask = unitOfWork.Courses.CountAsync(new CourseWithEnrollmentsSpecification());
 
             await Task.WhenAll(itemsTask, totalTask);
 

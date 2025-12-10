@@ -6,26 +6,22 @@ using CourseEnrollment.Data.Specifications;
 
 namespace CourseEnrollment.Business.Services
 {
-    public class EnrollmentService(
-        IRepository<StudentCourseEnrollment> enrollmentRepository,
-        IRepository<Course> courseRepository,
-        IRepository<Student> studentRepository
-        ) : IEnrollmentService
+    public class EnrollmentService(IUnitOfWork unitOfWork) : IEnrollmentService
     {
         public async Task<IEnumerable<StudentCourseEnrollment>> GetAllEnrollmentsAsync()
         {
-            return await enrollmentRepository.ListAsync(new EnrollmentWithDetailsSpecification());
+            return await unitOfWork.Enrollments.ListAsync(new EnrollmentWithDetailsSpecification());
         }
 
         public async Task<StudentCourseEnrollment?> GetEnrollmentByIdAsync(Guid id)
         {
-            return await enrollmentRepository.FirstOrDefaultAsync(new EnrollmentWithDetailsSpecification(id: id));
+            return await unitOfWork.Enrollments.FirstOrDefaultAsync(new EnrollmentWithDetailsSpecification(id: id));
         }
 
         public async Task<EnrollmentResult> EnrollStudentAsync(Guid studentId, Guid courseId)
         {
-            var studentExistsTask = studentRepository.GetByIdAsync(studentId);
-            var courseExistsTask = courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(courseId));
+            var studentExistsTask = unitOfWork.Students.GetByIdAsync(studentId);
+            var courseExistsTask = unitOfWork.Courses.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(courseId));
             var isEnrolledTask = IsStudentEnrolledAsync(studentId, courseId);
 
             await Task.WhenAll(studentExistsTask, courseExistsTask, isEnrolledTask);
@@ -77,7 +73,8 @@ namespace CourseEnrollment.Business.Services
                 CreatedAt = DateTime.UtcNow
             };
 
-            var createdEnrollment = await enrollmentRepository.AddAsync(enrollment);
+            var createdEnrollment = await unitOfWork.Enrollments.AddAsync(enrollment);
+            await unitOfWork.SaveChangesAsync();
             return new EnrollmentResult
             {
                 Success = true,
@@ -88,16 +85,17 @@ namespace CourseEnrollment.Business.Services
         public async Task<bool> IsStudentEnrolledAsync(Guid studentId, Guid courseId)
         {
             var spec = new EnrollmentWithDetailsSpecification(courseId: courseId, studentId: studentId);
-            var count = await enrollmentRepository.CountAsync(spec);
+            var count = await unitOfWork.Enrollments.CountAsync(spec);
             return count > 0;
         }
 
         public async Task<bool> UnenrollStudentAsync(Guid enrollmentId)
         {
-            var enrollment = await enrollmentRepository.GetByIdAsync(enrollmentId);
+            var enrollment = await unitOfWork.Enrollments.GetByIdAsync(enrollmentId);
             if (enrollment == null) return false;
 
-            await enrollmentRepository.DeleteAsync(enrollmentId);
+            await unitOfWork.Enrollments.DeleteAsync(enrollmentId);
+            await unitOfWork.SaveChangesAsync();
             return true;
         }
     }
