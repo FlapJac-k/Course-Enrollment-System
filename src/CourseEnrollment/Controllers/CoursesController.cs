@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using CourseEnrollment.Business.Interfaces;
+using CourseEnrollment.Business.Models;
 using CourseEnrollment.Data.Entities;
 using CourseEnrollment.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -8,11 +9,18 @@ namespace CourseEnrollment.Controllers
 {
     public class CoursesController(ICourseService courseService, IMapper mapper) : Controller
     {
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(int pageNumber = 1, int pageSize = 5)
         {
-            var courses = await courseService.GetAllCoursesAsync();
-            var viewModels = mapper.Map<IEnumerable<CourseViewModel>>(courses);
-            return View(viewModels);
+            var pagedCourses = await courseService.GetPagedCourseAsync(pageNumber, pageSize);
+            var viewModels = mapper.Map<IEnumerable<CourseViewModel>>(pagedCourses.Items);
+
+            var pagedViewModel = new PagedResult<CourseViewModel>(
+                viewModels,
+                pagedCourses.TotalCount,
+                pagedCourses.PageNumber,
+                pagedCourses.PageSize);
+
+            return View(pagedViewModel);
         }
 
         public async Task<IActionResult> Details(Guid id)
@@ -65,6 +73,8 @@ namespace CourseEnrollment.Controllers
             return View(viewModel);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, CourseViewModel viewModel)
         {
             if (id != viewModel.Id)

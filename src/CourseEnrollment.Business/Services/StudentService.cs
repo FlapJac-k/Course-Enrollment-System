@@ -1,10 +1,11 @@
 ﻿using CourseEnrollment.Business.Interfaces;
 using CourseEnrollment.Data.Entities;
 using CourseEnrollment.Data.Interfaces;
+using CourseEnrollment.Data.Specifications;
 
 namespace CourseEnrollment.Business.Services
 {
-    public class StudentService(IStudentRepository studentRepository) : IStudentService
+    public class StudentService(IRepository<Student> studentRepository) : IStudentService
     {
         public async Task<Student> CreateStudentAsync(Student student)
         {
@@ -55,7 +56,9 @@ namespace CourseEnrollment.Business.Services
 
         public async Task<bool> IsEmailUniqueAsync(string email, Guid? excludeId = null)
         {
-            return !await studentRepository.EmailExistsAsync(email, excludeId);
+            var spec = new StudentByEmailSpecification(email, excludeId);
+            var existingCount = await studentRepository.CountAsync(spec);
+            return existingCount == 0;
         }
     }
 }

@@ -1,19 +1,21 @@
 ﻿using CourseEnrollment.Business.Interfaces;
+using CourseEnrollment.Business.Models;
 using CourseEnrollment.Data.Entities;
 using CourseEnrollment.Data.Interfaces;
+using CourseEnrollment.Data.Specifications;
 
 namespace CourseEnrollment.Business.Services
 {
-    public class CourseService(ICourseRepository courseRepository) : ICourseService
+    public class CourseService(IRepository<Course> courseRepository) : ICourseService
     {
         public async Task<IEnumerable<Course>> GetAllCoursesAsync()
         {
-            return await courseRepository.GetAllAsync();
+            return await courseRepository.ListAsync(new CourseWithEnrollmentsSpecification());
         }
 
         public async Task<Course?> GetCourseByIdAsync(Guid id)
         {
-            return await courseRepository.GetByIdAsync(id);
+            return await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(id));
         }
 
         public async Task<Course> CreateCourseAsync(Course course)
@@ -26,7 +28,7 @@ namespace CourseEnrollment.Business.Services
         {
             ValidateMaxCapacity(course.MaximumCapacity);
 
-            var existingCourse = await courseRepository.GetByIdAsync(course.Id);
+            var existingCourse = await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(course.Id));
             if (existingCourse == null)
             {
                 throw new InvalidOperationException($"Course with ID {course.Id} not found.");
@@ -52,12 +54,30 @@ namespace CourseEnrollment.Business.Services
 
         public async Task<int> GetAvailableSlotsAsync(Guid courseId)
         {
-            var course = await courseRepository.GetByIdAsync(courseId);
+            var course = await courseRepository.FirstOrDefaultAsync(new CourseWithEnrollmentsSpecification(courseId));
             if (course == null)
             {
                 return 0;
             }
             return course.MaximumCapacity - course.Enrollments.Count;
+        }
+
+        public async Task<PagedResult<Course>> GetPagedCourseAsync(int pageNumber, int pageSize)
+        {
+            var pageParam = new PagingParams { PageNumber = pageNumber, PageSize = pageSize };
+            var pagedSpec = new CourseWithEnrollmentsSpecification(pageParam);
+
+            var itemsTask = courseRepository.ListAsync(pagedSpec);
+            var totalTask = courseRepository.CountAsync(new CourseWithEnrollmentsSpecification());
+
+            await Task.WhenAll(itemsTask, totalTask);
+
+            return new PagedResult<Course>(
+                itemsTask.Result,
+                totalTask.Result,
+                pageNumber,
+                pageSize
+            );
         }
 
 

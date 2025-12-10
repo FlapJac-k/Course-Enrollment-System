@@ -10,9 +10,7 @@ namespace CourseEnrollment.Extensions
         public static IServiceCollection AddProjectServices(this IServiceCollection services)
         {
             // Repositories
-            services.AddScoped<IStudentRepository, StudentRepository>();
-            services.AddScoped<ICourseRepository, CourseRepository>();
-            services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 
             // Services

@@ -1,5 +1,6 @@
 ﻿using CourseEnrollment.Data.Entities;
 using CourseEnrollment.Data.Interfaces;
+using CourseEnrollment.Data.Specifications;
 using Microsoft.EntityFrameworkCore;
 
 namespace CourseEnrollment.Data.Repositories
@@ -23,6 +24,21 @@ namespace CourseEnrollment.Data.Repositories
         public virtual async Task<IEnumerable<T>> GetAllAsync()
         {
             return await _dbSet.ToListAsync();
+        }
+
+        public virtual async Task<IReadOnlyList<T>> ListAsync(ISpecification<T> specification)
+        {
+            return await ApplySpecification(specification).ToListAsync();
+        }
+
+        public virtual async Task<T?> FirstOrDefaultAsync(ISpecification<T> specification)
+        {
+            return await ApplySpecification(specification).FirstOrDefaultAsync();
+        }
+
+        public virtual async Task<int> CountAsync(ISpecification<T> specification)
+        {
+            return await ApplySpecification(specification).CountAsync();
         }
 
         public virtual async Task<T> AddAsync(T entity)
@@ -52,6 +68,11 @@ namespace CourseEnrollment.Data.Repositories
                 _dbSet.Remove(entity);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        protected IQueryable<T> ApplySpecification(ISpecification<T> specification)
+        {
+            return SpecificationEvaluator<T>.GetQuery(_dbSet.AsQueryable(), specification);
         }
 
     }

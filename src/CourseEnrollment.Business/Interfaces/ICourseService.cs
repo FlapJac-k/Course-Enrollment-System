@@ -1,4 +1,5 @@
-﻿using CourseEnrollment.Data.Entities;
+﻿using CourseEnrollment.Business.Models;
+using CourseEnrollment.Data.Entities;
 
 namespace CourseEnrollment.Business.Interfaces
 {
@@ -10,5 +11,7 @@ namespace CourseEnrollment.Business.Interfaces
         Task<Course> UpdateCourseAsync(Course course);
         Task DeleteCourseAsync(Guid id);
         Task<int> GetAvailableSlotsAsync(Guid courseId);
+        Task<PagedResult<Course>> GetPagedCourseAsync(int pageNumber, int pageSize);
+
     }
 }
