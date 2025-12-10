@@ -1,0 +1,70 @@
+@using CourseEnrollment.Business.Models
+@model PagedResult<CourseEnrollment.Models.CourseViewModel>
+
+@{
+    ViewData["Title"] = "Courses";
+}
+
+<h1>Courses</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-primary">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Description</th>
+            <th>Maximum Capacity</th>
+            <th>Available Slots</th>
+            <th>Enrollments</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model.Items)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Description)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MaximumCapacity)
+                </td>
+                <td>
+                    <span class="badge @(item.AvailableSlots > 0 ? "bg-success" : "bg-danger")">
+                        @item.AvailableSlots
+                    </span>
+                </td>
+                <td>
+                    @item.EnrollmentCount
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">Details</a>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-success">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<nav aria-label="Course pagination">
+    <ul class="pagination">
+        <li class="page-item @(Model.HasPrevious ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber - 1)" asp-route-pageSize="@Model.PageSize"><span aria-hidden="true">&laquo;</span></a>
+        </li>
+        @for (int page = 1; page <= Model.TotalPages; page++)
+        {
+            <li class="page-item @(page == Model.PageNumber ? "active" : "")">
+                    <a class="page-link" asp-action="Index" asp-route-pageNumber="@(page)" asp-route-pageSize="@Model.PageSize">@(page)</a>
+            </li>
+        }
+        <li class="page-item @(Model.HasNext ? "" : "disabled")">
+            <a class="page-link" asp-action="Index" asp-route-pageNumber="@(Model.PageNumber + 1)" asp-route-pageSize="@Model.PageSize"><span aria-hidden="true">&raquo;</span></a>
+        </li>
+    </ul>
+</nav>
+

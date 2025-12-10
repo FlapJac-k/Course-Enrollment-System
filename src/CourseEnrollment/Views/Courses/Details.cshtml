@@ -1,0 +1,20 @@
+@model CourseEnrollment.Models.CourseViewModel
+
+@{
+    ViewData["Title"] = "Course Details";
+}
+
+<h1>Course Details</h1>
+
+<div>
+    <hr />
+    @await Html.PartialAsync("_CourseDetailsPartial", Model)
+    <hr />
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-success">Edit</a>
+    <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+</div>
+
+@* Partial view for course details (bonus) *@
+

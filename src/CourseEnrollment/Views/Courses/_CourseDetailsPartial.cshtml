@@ -1,0 +1,19 @@
+@model CourseEnrollment.Models.CourseViewModel
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5>Course Summary</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Title:</strong> @Model.Title</p>
+        <p><strong>Description:</strong> @(Model.Description ?? "No description")</p>
+        <p><strong>Capacity:</strong> @Model.MaximumCapacity students</p>
+        <p><strong>Available Slots:</strong> 
+            <span class="badge @(Model.AvailableSlots > 0 ? "bg-success" : "bg-danger")">
+                @Model.AvailableSlots
+            </span>
+        </p>
+        <p><strong>Enrolled:</strong> @Model.EnrollmentCount students</p>
+    </div>
+</div>
+
