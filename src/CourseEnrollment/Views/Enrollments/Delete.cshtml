@@ -1,0 +1,39 @@
+@model CourseEnrollment.Models.EnrollmentViewModel
+
+@{
+    ViewData["Title"] = "Unenroll Student";
+}
+
+<h1>Unenroll Student</h1>
+
+<h3>Are you sure you want to unenroll this student from the course?</h3>
+<div>
+    <hr />
+    <dl class="row">
+        <dt class="col-sm-2">
+            Student
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.StudentName)
+        </dd>
+        <dt class="col-sm-2">
+            Course
+        </dt>
+        <dd class="col-sm-10">
+            @Html.DisplayFor(model => model.CourseTitle)
+        </dd>
+        <dt class="col-sm-2">
+            @Html.DisplayNameFor(model => model.EnrollmentDate)
+        </dt>
+        <dd class="col-sm-10">
+            @Model.EnrollmentDate.ToString("yyyy-MM-dd HH:mm")
+        </dd>
+    </dl>
+
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="Id" />
+        <input type="submit" value="Unenroll" class="btn btn-danger" />
+        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+    </form>
+</div>
+

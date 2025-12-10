@@ -1,0 +1,74 @@
+@model CourseEnrollment.Models.CreateEnrollmentViewModel
+
+@{
+    ViewData["Title"] = "Create Enrollment";
+}
+
+<h1>Create Enrollment</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group mb-3">
+                <label asp-for="StudentId" class="control-label"></label>
+                <select asp-for="StudentId" asp-items="Model.Students" class="form-control">
+                    <option value="">-- Select Student --</option>
+                </select>
+                <span asp-validation-for="StudentId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="CourseId" class="control-label"></label>
+                <select asp-for="CourseId" asp-items="Model.Courses" class="form-control" id="courseSelect">
+                    <option value="">-- Select Course --</option>
+                </select>
+                <span asp-validation-for="CourseId" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <div id="availableSlots" class="alert alert-info" style="display: none;">
+                    <strong>Available Slots:</strong> <span id="slotsCount">0</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Enroll" class="btn btn-primary" />
+                <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#courseSelect').change(function () {
+                var courseId = $(this).val();
+                if (courseId) {
+                    $.ajax({
+                        url: '@Url.Action("GetAvailableSlots", "Enrollments")',
+                        type: 'GET',
+                        data: { courseId: courseId },
+                        success: function (data) {
+                            $('#slotsCount').text(data.availableSlots);
+                            $('#availableSlots').show();
+                            
+                            if (data.availableSlots > 0) {
+                                $('#availableSlots').removeClass('alert-danger').addClass('alert-info');
+                            } else {
+                                $('#availableSlots').removeClass('alert-info').addClass('alert-danger');
+                                $('#availableSlots').html('<strong>Course is Full!</strong> No available slots.');
+                            }
+                        },
+                        error: function () {
+                            $('#availableSlots').hide();
+                        }
+                    });
+                } else {
+                    $('#availableSlots').hide();
+                }
+            });
+        });
+    </script>
+}
+
