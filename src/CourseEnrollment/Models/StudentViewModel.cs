@@ -20,11 +20,13 @@ namespace CourseEnrollment.Models
         public DateTime Birthdate { get; set; }
 
         [Required(ErrorMessage = "National ID is required")]
-        [StringLength(14, ErrorMessage = "National ID must be maximum 14 characters")]
+        [StringLength(14, MinimumLength = 14, ErrorMessage = "National ID must be exactly 14 digits")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "National ID must contain only digits")]
         [Display(Name = "National ID")]
         public required string NationalId { get; set; }
 
-        [StringLength(11, ErrorMessage = "Phone number must be maximum 11 characters")]
+        [StringLength(11, MinimumLength = 11, ErrorMessage = "Phone number must be exactly 11 digits")]
+        [RegularExpression(@"^\d+$", ErrorMessage = "Phone number must contain only digits")]
         [Display(Name = "Phone Number")]
         public string? PhoneNumber { get; set; }
     }

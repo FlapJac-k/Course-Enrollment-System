@@ -15,7 +15,7 @@ namespace CourseEnrollment.Models
         [Required(ErrorMessage = "Maximum capacity is required")]
         [Range(1, int.MaxValue, ErrorMessage = "Maximum capacity must be at least 1")]
         [Display(Name = "Maximum Capacity")]
-        public required int MaxCapacity { get; set; }
+        public required int MaximumCapacity { get; set; }
 
         public int AvailableSlots { get; set; }
         public int EnrollmentCount { get; set; }
