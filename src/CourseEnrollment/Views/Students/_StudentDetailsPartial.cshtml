@@ -1,0 +1,15 @@
+@model CourseEnrollment.Models.StudentViewModel
+
+<div class="card mt-3">
+    <div class="card-header">
+        <h5>Student Summary</h5>
+    </div>
+    <div class="card-body">
+        <p><strong>Name:</strong> @Model.FullName</p>
+        <p><strong>Email:</strong> @Model.Email</p>
+        <p><strong>Birthdate:</strong> @Model.Birthdate.ToString("yyyy-MM-dd")</p>
+        <p><strong>National ID:</strong> @Model.NationalId</p>
+        <p><strong>Phone:</strong> @(Model.PhoneNumber ?? "Not provided")</p>
+    </div>
+</div>
+
